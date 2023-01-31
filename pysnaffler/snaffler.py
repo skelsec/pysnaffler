@@ -1,6 +1,5 @@
 import asyncio
 from pysnaffler.ruleset import SnafflerRuleSet
-from aiosmb.commons.connection.factory import SMBConnectionFactory
 from pysnaffler.utils import sizeof_fmt
 from typing import List
 import toml
