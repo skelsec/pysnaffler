@@ -40,11 +40,11 @@ class SnafflerResult:
 		try:
 			# tab separater line containing filename, rule triage color, file size, file size in human readable format,  file last modified date, full unc path, data.
 			if self.otype == 'file':
-				return '%s [File]\t%s\t%s\tR\t%s\t%s\t%s\t%s\t%s' % (datetime.datetime.utcnow().isoformat(), self.rule.triage.name, self.rule.ruleName, self.smbobj.size, sizeof_fmt(self.smbobj.size), self.smbobj.last_write_time.isoformat(), self.smbobj.unc_path, self.data_to_line())
+				return '%s\t[File]\t%s\t%s\tR\t%s\t%s\t%s\t%s\t%s' % (datetime.datetime.utcnow().isoformat(), self.rule.triage.name, self.rule.ruleName, self.smbobj.size, sizeof_fmt(self.smbobj.size), self.smbobj.last_write_time.isoformat(), self.smbobj.unc_path, self.data_to_line())
 			elif self.otype == 'dir':
-				return '%s [Dir]\t%s\t%s\tR\t%s\t%s\t%s\t%s\t%s' % (datetime.datetime.utcnow().isoformat(), self.rule.triage.name, self.rule.ruleName, '0', '', '', self.smbobj.unc_path, '')
+				return '%s\t[Dir]\t%s\t%s\tR\t%s\t%s\t%s\t%s\t%s' % (datetime.datetime.utcnow().isoformat(), self.rule.triage.name, self.rule.ruleName, '0', '', '', self.smbobj.unc_path, '')
 			elif self.otype == 'share': 
-				return '%s [Share]\t%s\t%s\tR\t%s\t%s\t%s\t%s\t%s' % (datetime.datetime.utcnow().isoformat(), self.rule.triage.name, self.rule.ruleName, '0', '', '', self.smbobj.unc_path, '')
+				return '%s\t[Share]\t%s\t%s\tR\t%s\t%s\t%s\t%s\t%s' % (datetime.datetime.utcnow().isoformat(), self.rule.triage.name, self.rule.ruleName, '0', '', '', self.smbobj.unc_path, '')
 		except Exception as e:
 			traceback.print_exc()
 			raise e
