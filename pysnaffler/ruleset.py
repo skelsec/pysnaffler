@@ -74,7 +74,7 @@ class SnafflerRuleSet:
 		to_dl, rules = self.enum_file(smbfile)
 		if to_dl is False:
 			return False, []
-		rules, _, _ = self.unroll_relays(rules)
+		rules = self.unroll_relays(rules)
 		return True, rules
 
 	def load_rule(self, rule):
@@ -190,7 +190,16 @@ class SnafflerRuleSet:
 	async def parse_file(self, filepath, rules:List[SnaffleRule]):
 		finalrules = self.unroll_relays(rules)
 		for rule in finalrules:
-			res, err = rule.open_and_match(filepath)
+			if rule.enumerationScope == EnumerationScope.ContentsEnumeration:
+				res, err = rule.open_and_match(filepath)
+			else:
+				tograb = rule.match(filepath)
+				if tograb is False:
+					continue
+				# maybe we'd need to be recursive here?
+				# TODO: check if we need to be recursive here
+				err = None
+				res = ''
 			if err is not None:
 				yield None, rule, err
 			if res:

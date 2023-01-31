@@ -23,7 +23,7 @@ async def amain():
 	parser.add_argument('-o', '--out-file', help='Output file path.')
 	parser.add_argument('-e', '--errors', action='store_true', help='Includes errors in output.')
 	parser.add_argument('-d', '--dry-run', action='store_true', help='Dry run. Enumeration only, gives stats on what would be downloaded/checked etc.')
-	parser.add_argument('-l', '--gen-filelist', action='store_true', help='Generates filelist file containing a list of files and folders enumerated')
+	parser.add_argument('-l', '--filelist', action='store_true', help='Generates filelist file containing a list of files and folders enumerated')
 	parser.add_argument('-k', '--keep-files', action='store_true', help='Keeps downloaded files on disk after parsing')
 	parser.add_argument('-b', '--base-path', default = 'snaffler_downloads', help='Base directory path for downloaded files')
 	parser.add_argument('-c', '--config', help='Path to config file. Overrides all other options.')
@@ -55,7 +55,7 @@ async def amain():
 			args.keep_files,
 			args.base_path,
 			args.dry_run,
-			args.gen_filelist
+			args.filelist
 		)
 	
 	#print('Running config:')

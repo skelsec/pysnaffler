@@ -9,6 +9,7 @@ from pysnaffler.rules.rule import SnaffleRule
 from aiosmb.commons.interfaces.machine import SMBMachine
 from aiosmb.commons.interfaces.file import SMBFile
 from aiosmb.commons.connection.factory import SMBConnectionFactory
+from aiosmb.examples.scanners.smbfile import SMBFileRes
 from pysnaffler.snaffler import pySnaffler
 from pysnaffler.utils import sizeof_fmt
 
@@ -88,6 +89,7 @@ class SnafflerScanner:
 			return None, e
 
 	async def process_file(self, connection, smbfile:SMBFile, matchingrules:List[SnaffleRule], targetid:str, target:str, out_queue:asyncio.Queue):
+		fpath = None
 		try:
 			await out_queue.put(ScannerInfo(target, 'Downloading %s' % smbfile.unc_path))
 			fpath, err = await self.download_file(connection, smbfile)
@@ -107,17 +109,20 @@ class SnafflerScanner:
 				
 				await out_queue.put(ScannerData(target, SnafflerResult('file', smbfile, rule, data)))
 			
-			if self.snaffler.keep_files is False:
-				Path(fpath).unlink()				
-			
 		except Exception as e:
 			print(e)
+		finally:
+			if fpath is not None and self.snaffler.keep_files is False:
+				Path(fpath).unlink()	
 	
 	async def snaffle_machine(self, machine:SMBMachine, targetid:str, target:str, out_queue:asyncio.Queue):
 		async for obj, otype, err in machine.enum_files_with_filter(self.__filter_share_and_dir):
 			if err is not None:
 				#print(err)
 				continue
+			if self.snaffler.gen_filelist is True:
+				await out_queue.put(ScannerData(target, SMBFileRes(obj, otype, None)))
+
 			if otype == 'file':
 				
 				tograb, matchingrules = self.snaffler.ruleset.enum_file(obj)
@@ -127,8 +132,10 @@ class SnafflerScanner:
 				if obj.size > self.snaffler.max_file_size:
 					self.snaffler.stat_flarge += 1
 					for rule in matchingrules:
-						await out_queue.put(ScannerData(target, SnafflerResult('file', obj, rule, None)))
+						await out_queue.put(ScannerData(target, SnafflerResult('file', obj, rule, 'Skipped due to file size constraints')))
 					
+					continue
+				if obj.size == 0:
 					continue
 
 				self.snaffler.stat_fcnt += 1
