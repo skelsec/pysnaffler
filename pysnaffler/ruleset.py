@@ -102,12 +102,8 @@ class SnafflerRuleSet:
 	
 	def load_directory(self, directory):
 		"""Adds all rules from a directory recursively"""
-		ctr = 0
-		fctr = 0
 		for rulefilepath in glob(directory + '/**/*.toml', recursive=True):
 			self.load_rule_file(rulefilepath)
-		
-		print('Loaded %d rules from %s files' % (ctr, fctr))
 	
 	def to_dict(self):
 		return {
@@ -187,13 +183,15 @@ class SnafflerRuleSet:
 		self.unrollCache[lookupkey] = finalrules.values()
 		return finalrules.values()
 
-	async def parse_file(self, filepath, rules:List[SnaffleRule]):
+	async def parse_file(self, filepath, rules:List[SnaffleRule], fsize:int = 0):
 		finalrules = self.unroll_relays(rules)
 		for rule in finalrules:
 			if rule.enumerationScope == EnumerationScope.ContentsEnumeration:
 				res, err = rule.open_and_match(filepath)
 			else:
-				tograb = rule.match(filepath)
+				temp = SMBFile.from_uncpath(filepath)
+				temp.size = fsize
+				tograb = rule.match(temp)
 				if tograb is False:
 					continue
 				# maybe we'd need to be recursive here?

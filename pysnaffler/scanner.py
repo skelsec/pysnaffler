@@ -100,7 +100,7 @@ class SnafflerScanner:
 				# file got skipped
 				return
 			await out_queue.put(ScannerInfo(target, 'Processing %s' % smbfile.unc_path))
-			async for data, rule, err in self.snaffler.ruleset.parse_file(fpath, matchingrules):
+			async for data, rule, err in self.snaffler.ruleset.parse_file(fpath, matchingrules, smbfile.size):
 				if err is not None:
 					# error handling ?
 					continue
@@ -170,5 +170,7 @@ class SnafflerScanner:
 				machine = SMBMachine(connection)
 				await self.snaffle_machine(machine, targetid, target, out_queue)
 
+		except asyncio.CancelledError:
+			return
 		except Exception as e:
 			await out_queue.put(ScannerError(target, e))
