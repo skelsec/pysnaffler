@@ -39,7 +39,7 @@ setup(
 	# long_description=open("README.txt").read(),
 	python_requires='>=3.7',
 	install_requires=[
-		'aiosmb>=0.4.5',
+		'aiosmb>=0.4.7',
 		'toml',
 	],
 	
