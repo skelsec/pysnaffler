@@ -8,7 +8,7 @@ name: Build Windows Executable - PyInstaller
 on:
   push:
     branches:
-      - master # Trigger on push to master branch
+      - main # Trigger on push to main branch
 
 jobs:
   build:
