@@ -45,7 +45,6 @@ setup(
 	
 	classifiers=[
 		"Programming Language :: Python :: 3.7",
-		"License :: OSI Approved :: MIT License",
 		"Operating System :: OS Independent",
 	],
 	entry_points={
