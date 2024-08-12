@@ -8,16 +8,12 @@ class SnafflerContentsEnumerationRule(SnaffleRule):
 		super().__init__(enumerationScope, ruleName, matchAction, relayTargets, description, matchLocation, wordListType, matchLength, wordList, triage)
 	
 	def match(self, data):
+		matches = []
 		for rex in self.wordList:
 			res = rex.findall(data)
-			if res is not None:
-				for r in res:
-					if r != '':
-						break
-				else:
-					return ''
-				return '\r\n'.join(res)
-		return None
+			if res != None and res != []:
+				matches += res
+		return '\r\n'.join(matches)
 
 	def open_and_match(self, filename):
 		try:
