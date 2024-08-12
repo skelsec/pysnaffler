@@ -188,6 +188,10 @@ class SnafflerRuleSet:
 		for rule in finalrules:
 			if rule.enumerationScope == EnumerationScope.ContentsEnumeration:
 				res, err = rule.open_and_match(filepath)
+				if err is not None:
+					yield None, rule, err
+				if res:
+					yield res, rule, None
 			else:
 				temp = SMBFile.from_uncpath(filepath)
 				temp.size = fsize
@@ -198,9 +202,6 @@ class SnafflerRuleSet:
 				# TODO: check if we need to be recursive here
 				err = None
 				res = ''
-			if err is not None:
-				yield None, rule, err
-			if res:
 				yield res, rule, None
 
 if __name__ == '__main__':
