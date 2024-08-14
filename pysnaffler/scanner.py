@@ -90,6 +90,7 @@ class SnafflerScanner:
 
 	async def process_file(self, connection, smbfile:SMBFile, matchingrules:List[SnaffleRule], targetid:str, target:str, out_queue:asyncio.Queue):
 		fpath = None
+		keep_file = False
 		try:
 			await out_queue.put(ScannerInfo(target, 'Downloading %s' % smbfile.unc_path))
 			fpath, err = await self.download_file(connection, smbfile)
@@ -107,12 +108,13 @@ class SnafflerScanner:
 				if data is None:
 					continue
 				
+				keep_file = True
 				await out_queue.put(ScannerData(target, SnafflerResult('file', smbfile, rule, data)))
 			
 		except Exception as e:
 			print(e)
 		finally:
-			if fpath is not None and self.snaffler.keep_files is False:
+			if fpath is not None and (self.snaffler.keep_files is False or keep_file is False):
 				Path(fpath).unlink()	
 	
 	async def snaffle_machine(self, machine:SMBMachine, targetid:str, target:str, out_queue:asyncio.Queue):
