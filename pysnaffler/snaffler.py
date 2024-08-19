@@ -3,6 +3,7 @@ from pysnaffler.ruleset import SnafflerRuleSet
 from pysnaffler.utils import sizeof_fmt
 from typing import List
 import toml
+import os
 
 class pySnaffler:
 	def __init__(self, ruleset:SnafflerRuleSet = None, max_file_size:int = 10485760, max_connections:int = 200, 
@@ -45,6 +46,13 @@ class pySnaffler:
 	def to_toml(self):
 		# serialize all the settings to a toml file
 		return toml.dumps(self.to_dict())
+
+	def clean_working_directory(self):
+		for directory, subdirs, _ in os.walk(self.download_base_dir, topdown=False):
+			for subdir in subdirs:
+				path = os.path.join(directory, subdir)
+				if len(os.listdir(path)) == 0:
+					os.rmdir(path)
 
 	@staticmethod
 	def from_dict(d:dict):

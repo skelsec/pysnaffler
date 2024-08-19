@@ -64,6 +64,7 @@ async def amain():
 	tgen = UniTargetGen.from_list(args.targets)
 	scanner = UniScanner('Snaffler', executors, [tgen], worker_count=args.worker_count, host_timeout=timeout)
 	await scanner.scan_and_process(progress=args.no_progress, out_file=args.out_file, include_errors=args.errors)
+	snaffler.clean_working_directory()
 	snaffler.print_stats()
 
 
