@@ -31,6 +31,8 @@ class SnafflerRuleSet:
 
 	def enum_directory(self, directory) -> Tuple[bool, List[Triage]]:
 		rules = []
+		if directory.startswith('\\') is False:
+			directory = '\\' + directory
 		for rule in self.directoryEnumerationRules.values():
 			action, triage = rule.determine_action(directory)
 			if action is MatchAction.Discard:
