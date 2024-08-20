@@ -48,6 +48,9 @@ class SnafflerResult:
 		except Exception as e:
 			traceback.print_exc()
 			raise e
+	
+	def __str__(self):
+		return self.to_line()
 
 class SnafflerScanner:
 	"""This is an interface object for aiosmb's scanner"""
