@@ -24,12 +24,12 @@ If installed via pip you'll get two executables:
   
 Use `pysnaffler -h` to see all parameters.
 # Example
-- Enumerate `10.10.10.2` using the password credentials of `TEST\victim` user using `NTLM` auth.
+- Enumerate `10.10.10.2` using the password credentials of `TEST\victim` user using `NTLM` auth.  
 `pysnaffler 'smb2+ntlm-password://TEST\victim:Passw0rd!1@10.10.10.2' 10.10.10.2`
   
-- Enumerate `10.10.10.2` using the NT credentials of `TEST\victim` user using `NTLM` auth.
+- Enumerate `10.10.10.2` using the NT credentials of `TEST\victim` user using `NTLM` auth.  
 `pysnaffler 'smb2+ntlm-nt://TEST\victim:<NThash>@10.10.10.2' 10.10.10.2`
   
-- Enumerate `win2019ad.test.corp` using the password credentials of `TEST\victim` user using `KERBEROS` auth.
+- Enumerate `win2019ad.test.corp` using the password credentials of `TEST\victim` user using `KERBEROS` auth.  
 `pysnaffler 'smb2+kerberos+password://TEST\victim:Passw0rd!1@win2019ad.test.corp/?dc=10.10.10.2' 10.10.10.2`
 

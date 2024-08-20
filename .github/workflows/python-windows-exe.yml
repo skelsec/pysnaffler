@@ -8,7 +8,9 @@ name: Build Windows Executable - PyInstaller
 on:
   push:
     branches:
-      - main # Trigger on push to master branch
+      - main # Trigger on push to main branch
+    tags:
+      - '*'  # Trigger on any tag push
 
 jobs:
   build:
@@ -45,11 +47,12 @@ jobs:
       working-directory: ${{ github.workspace }}/builder/pyinstaller
       shell: cmd
     
-    #- name: Upload Executable
-    #  uses: actions/upload-artifact@v2
-    #  with:
-    #    name: executable
-    #    path: builder\pyinstaller\*.exe
+    - name: Upload Artifacts for Download
+      uses: actions/upload-artifact@v2
+      with:
+        name: executables
+        path: builder\pyinstaller\*.exe
+        retention-days: 10
         
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
@@ -63,3 +66,17 @@ jobs:
         gsutil cp builder\pyinstaller\*.exe gs://skelsec-github-foss/${{ github.event.repository.name }}/$PROJVERSION/
         gsutil cp builder\pyinstaller\*.7z gs://skelsec-github-foss/${{ github.event.repository.name }}/$PROJVERSION/
       shell: powershell
+
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+        files: |
+          builder\pyinstaller\*.exe
+          builder\pyinstaller\*.7z
