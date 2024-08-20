@@ -1,6 +1,5 @@
 
 # https://stackoverflow.com/questions/1094841/get-human-readable-version-of-file-size
-@staticmethod
 def sizeof_fmt(num, suffix='B'):
 	if num is None:
 		return ''
