@@ -104,7 +104,7 @@ class SnafflerScanner:
 				# file got skipped
 				return
 			await out_queue.put(ScannerInfo(target, 'Processing %s' % smbfile.unc_path))
-			async for data, rule, err in self.snaffler.ruleset.parse_file(fpath, matchingrules, smbfile.size):
+			async for data, rule, err in self.snaffler.ruleset.parse_file(fpath, matchingrules, smbfile.size, self.snaffler.chars_before_match, self.snaffler.chars_after_match):
 				if err is not None:
 					# error handling ?
 					continue

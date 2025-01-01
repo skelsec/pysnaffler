@@ -26,6 +26,8 @@ async def amain():
 	parser.add_argument('-l', '--filelist', action='store_true', help='Generates filelist file containing a list of files and folders enumerated')
 	parser.add_argument('-k', '--keep-files', action='store_true', help='Keeps downloaded files on disk after parsing')
 	parser.add_argument('-b', '--base-path', default = 'snaffler_downloads', help='Base directory path for downloaded files')
+	parser.add_argument('--chars-before-match', type=int, default=0, help='Number of characters to show in output file before a match')
+	parser.add_argument('--chars-after-match', type=int, default=0, help='Number of characters to show in output file after a match')
 	parser.add_argument('-c', '--config', help='Path to config file. Overrides all other options.')
 	parser.add_argument('url', help = 'Connection string in URL format')
 	parser.add_argument('targets', nargs='*', help = 'Hostname or IP address or file with a list of targets')
@@ -55,7 +57,9 @@ async def amain():
 			args.keep_files,
 			args.base_path,
 			args.dry_run,
-			args.filelist
+			args.filelist,
+			args.chars_before_match,
+			args.chars_after_match
 		)
 	
 	#print('Running config:')

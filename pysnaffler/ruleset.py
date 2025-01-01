@@ -185,11 +185,11 @@ class SnafflerRuleSet:
 		self.unrollCache[lookupkey] = finalrules.values()
 		return finalrules.values()
 
-	async def parse_file(self, filepath, rules:List[SnaffleRule], fsize:int = 0):
+	async def parse_file(self, filepath, rules:List[SnaffleRule], fsize:int = 0, chars_before_match:int = 0, chars_after_match:int = 0):
 		finalrules = self.unroll_relays(rules)
 		for rule in finalrules:
 			if rule.enumerationScope == EnumerationScope.ContentsEnumeration:
-				res, err = rule.open_and_match(filepath)
+				res, err = rule.open_and_match(filepath, chars_before_match, chars_after_match)
 				if err is not None:
 					yield None, rule, err
 				if res:
