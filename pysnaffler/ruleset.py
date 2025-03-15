@@ -4,6 +4,7 @@ from pysnaffler.rules.rule import SnaffleRule
 from pathlib import PureWindowsPath
 from glob import glob
 from aiosmb.commons.interfaces.file import SMBFile
+from typing import Union
 import hashlib
 
 class SnafflerRuleSet:
@@ -42,12 +43,12 @@ class SnafflerRuleSet:
 		
 		return True, rules
 	
-	def enum_file(self, filename) -> Tuple[bool, List[SnaffleRule]]:
+	def enum_file(self, smbfile:Union[SMBFile, None], fullpath:str=None, name:str=None, size:int=None) -> Tuple[bool, List[SnaffleRule]]:
 		"""Returns True if the file should be enumerated, False if it should be discarded.
 		Returns a list of rules that matched the file."""
 		rules = []
 		for rule in self.fileEnumerationRules.values():
-			res, triage = rule.determine_action(filename)
+			res, triage = rule.determine_action(smbfile, fullpath=fullpath, name=name, size=size)
 			if res is None:
 				continue
 			if res == MatchAction.Discard:

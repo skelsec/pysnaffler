@@ -36,14 +36,14 @@ class SnaffleRule:
 		self.wordList = res
 
 	
-	def match(self, data):
+	def match(self, data, **kwargs):
 		for rex in self.wordList:
 			if rex.search(data) is not None:
 				return True
 		return False
 
-	def determine_action(self, data):
-		if self.match(data) is False:
+	def determine_action(self, data, **kwargs):
+		if self.match(data, **kwargs) is False:
 			return None, None
 		return self.matchAction, self.triage
 	

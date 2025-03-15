@@ -6,13 +6,13 @@ class SnafflerDirectoryRule(SnaffleRule):
 	def __init__(self, enumerationScope:EnumerationScope, ruleName:str, matchAction:MatchAction, relayTargets:List[str], description:str, matchLocation:MatchLoc, wordListType:MatchListType, matchLength:int, wordList:List[str], triage:Triage):
 		super().__init__(enumerationScope, ruleName, matchAction, relayTargets, description, matchLocation, wordListType, matchLength, wordList, triage)
 	
-	def match(self, data):
+	def match(self, data, **kwargs):
 		for rex in self.wordList:
 			if rex.search(data) is not None:
 				return True
 		return False
 
-	def determine_action(self, data):
-		if self.match(data) is False:
+	def determine_action(self, data, **kwargs):
+		if self.match(data, **kwargs) is False:
 			return None, None
 		return self.matchAction, self.triage

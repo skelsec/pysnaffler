@@ -8,15 +8,23 @@ class SnafflerFileRule(SnaffleRule):
 	def __init__(self, enumerationScope:EnumerationScope, ruleName:str, matchAction:MatchAction, relayTargets:List[str], description:str, matchLocation:MatchLoc, wordListType:MatchListType, matchLength:int, wordList:List[str], triage:Triage):
 		super().__init__(enumerationScope, ruleName, matchAction, relayTargets, description, matchLocation, wordListType, matchLength, wordList, triage)
 	
-	def match(self, smbfile):
+	def match(self, smbfile, fullpath:str=None, name:str=None, size:int=None, **kwargs):
+		if smbfile is not None:
+			fullpath = smbfile.fullpath
+			name = smbfile.name
+			size = smbfile.size
+		else:
+			if fullpath is None or name is None or size is None:
+				raise ValueError('If smbfile is not provided, fullpath, name, and size are required for file matching')
+
 		if self.matchLocation == MatchLoc.FileName:
 			for rex in self.wordList:
-				if rex.search(smbfile.name) is not None:
+				if rex.search(name) is not None:
 					return True
 		elif self.matchLocation == MatchLoc.FileExtension:
-			fullpath = copy.deepcopy(smbfile.fullpath)
+			fullpath = copy.deepcopy(fullpath)
 			if fullpath.endswith('.bak') is True:
-				fullpath = smbfile.fullpath[:-4]
+				fullpath = fullpath[:-4]
 			ext = Path(fullpath).suffix
 			if ext == '':
 				return False
@@ -25,14 +33,14 @@ class SnafflerFileRule(SnaffleRule):
 					return True
 		elif self.matchLocation == MatchLoc.FilePath:
 			for rex in self.wordList:
-				if rex.search(smbfile.fullpath) is not None:
+				if rex.search(fullpath) is not None:
 					return True
 		elif self.matchLocation == MatchLoc.FileLength:
-			if smbfile.size == self.matchLength:
+			if size == self.matchLength:
 				return True
 		return False
 
-	def determine_action(self, smbfile):
-		if self.match(smbfile) is False:
+	def determine_action(self, smbfile, fullpath:str=None, name:str=None, size:int=None, **kwargs):
+		if self.match(smbfile, fullpath=fullpath, name=name, size=size, **kwargs) is False:
 			return None, None
 		return self.matchAction, self.triage

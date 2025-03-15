@@ -34,5 +34,5 @@ class SnafflerContentsEnumerationRule(SnaffleRule):
 		except Exception as e:
 			return False, e
 
-	def determine_action(self, data):
+	def determine_action(self, data, **kwargs):
 		pass
