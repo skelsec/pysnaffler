@@ -9,7 +9,7 @@ class pySnaffler:
 	def __init__(self, ruleset:SnafflerRuleSet = None, max_file_size:int = 10485760, max_connections:int = 200, 
 					max_downloads:int = 4, max_downloads_total:int = 20, keep_files:bool = False, 
 					download_base_dir:str = './snaffler_downloads', dry_run:bool = False, gen_filelist:bool = False,
-					chars_before_match:int = 0, chars_after_match:int = 0):
+					chars_before_match:int = 0, chars_after_match:int = 0, nfs:bool = False):
 		self.ruleset = ruleset
 		self.download_base_dir = download_base_dir
 		self.max_file_size = max_file_size
@@ -21,6 +21,7 @@ class pySnaffler:
 		self.gen_filelist = gen_filelist
 		self.chars_before_match = chars_before_match
 		self.chars_after_match = chars_after_match
+		self.nfs = nfs
 		self.stat_fcnt = 0
 		self.stat_fsize = 0
 		self.stat_flarge = 0
@@ -45,7 +46,8 @@ class pySnaffler:
 			'dry_run' : self.dry_run,
 			'gen_filelist' : self.gen_filelist,
 			'chars_before_match': self.chars_before_match,
-			'chars_after_match': self.chars_after_match
+			'chars_after_match': self.chars_after_match,
+			'nfs': self.nfs
 		}
 
 	def to_toml(self):
@@ -77,7 +79,8 @@ class pySnaffler:
 			d['dry_run'],
 			d['gen_filelist'],
 			d['chars_before_match'],
-			d['chars_after_match']
+			d['chars_after_match'],
+			d['nfs']
 		)
 
 	@staticmethod

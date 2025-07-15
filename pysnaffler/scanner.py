@@ -4,6 +4,7 @@ import traceback
 from pathlib import Path
 from typing import List
 from asysocks.unicomm.common.scanner.common import *
+from pysnaffler.protocol import NFSProtocolClient, ProtocolClient, SMBProtocolClient
 from pysnaffler.rules.rule import SnaffleRule
 
 from aiosmb.commons.interfaces.machine import SMBMachine
@@ -13,6 +14,7 @@ from aiosmb.examples.scanners.smbfile import SMBFileRes
 from pysnaffler.snaffler import pySnaffler
 from pysnaffler.utils import sizeof_fmt
 
+from anfs.protocol.nfs3.common.factory import NFS3ConnectionFactory
 
 class SnafflerResult:
 	def __init__(self, otype:str, smbobj, rule:SnaffleRule, data:str or bytes = None):
@@ -78,25 +80,25 @@ class SnafflerScanner:
 			print('Error processing %s: %s' % (obj, e))
 			return False
 
-	async def download_file(self, connection, smbfile:SMBFile):
+	async def download_file(self, protocol_client: ProtocolClient, smbfile:SMBFile):
 		try:
 			async with self.snaffler.total_dl_semaphore:
 				async with self.download_semaphore:
 					localpath = SMBFile.prepare_mirror_path(self.snaffler.download_base_dir, smbfile.unc_path)
 					localpath.mkdir(parents=True, exist_ok=True)
-					fpath, err = await smbfile.download(connection, str(localpath))
+					fpath, err = await protocol_client.donwload_file(smbfile, str(localpath), self.snaffler.max_file_size)
 					if err is not None:
 						return None, err
 					return fpath, None
 		except Exception as e:
 			return None, e
 
-	async def process_file(self, connection, smbfile:SMBFile, matchingrules:List[SnaffleRule], targetid:str, target:str, out_queue:asyncio.Queue):
+	async def process_file(self, protocol_client: ProtocolClient, smbfile:SMBFile, matchingrules:List[SnaffleRule], targetid:str, target:str, out_queue:asyncio.Queue):
 		fpath = None
 		keep_file = False
 		try:
 			await out_queue.put(ScannerInfo(target, 'Downloading %s' % smbfile.unc_path))
-			fpath, err = await self.download_file(connection, smbfile)
+			fpath, err = await self.download_file(protocol_client, smbfile)
 			if err is not None:
 				await out_queue.put(ScannerInfo(target, 'Error downloading %s: %s' % (smbfile.unc_path, err)))
 				return
@@ -120,8 +122,8 @@ class SnafflerScanner:
 			if fpath is not None and (self.snaffler.keep_files is False or keep_file is False):
 				Path(fpath).unlink()	
 	
-	async def snaffle_machine(self, machine:SMBMachine, targetid:str, target:str, out_queue:asyncio.Queue):
-		async for obj, otype, err in machine.enum_files_with_filter(self.__filter_share_and_dir):
+	async def snaffle_machine(self, protocol_client: ProtocolClient, targetid:str, target:str, out_queue:asyncio.Queue):
+		async for obj, otype, err in protocol_client.enum_files_with_filter(self.__filter_share_and_dir):
 			if err is not None:
 				#print(err)
 				continue
@@ -149,7 +151,7 @@ class SnafflerScanner:
 				if self.snaffler.dry_run is True:
 					continue
 
-				await self.process_file(machine.connection, obj, matchingrules, targetid, target, out_queue)
+				await self.process_file(protocol_client, obj, matchingrules, targetid, target, out_queue)
 			elif otype == 'dir':
 				# at this point it sure matches to at least one rule
 				tograb, rules = self.snaffler.ruleset.enum_directory(obj.fullpath)
@@ -166,15 +168,14 @@ class SnafflerScanner:
 	
 	async def run(self, targetid, target, out_queue:asyncio.Queue):
 		try:
-			connection = self.factory.create_connection_newtarget(target)
-			async with connection:
-				_, err = await connection.login()
-				if err is not None:
-					raise err
-
-				machine = SMBMachine(connection)
-				await self.snaffle_machine(machine, targetid, target, out_queue)
-
+			if isinstance(self.factory, NFS3ConnectionFactory):
+				protocol_client = NFSProtocolClient(self.factory, target)
+			else:
+				protocol_client = SMBProtocolClient(self.factory, target)
+			
+			await protocol_client.connect_to_target(target)
+			await self.snaffle_machine(protocol_client, targetid, target, out_queue)
+				
 		except asyncio.CancelledError:
 			return
 		except Exception as e:

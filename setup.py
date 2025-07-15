@@ -40,6 +40,7 @@ setup(
 	python_requires='>=3.7',
 	install_requires=[
 		'aiosmb>=0.4.7',
+		'anfs',
 		'toml',
 	],
 	
