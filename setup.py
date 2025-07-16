@@ -39,8 +39,8 @@ setup(
 	# long_description=open("README.txt").read(),
 	python_requires='>=3.7',
 	install_requires=[
-		'aiosmb>=0.4.7',
-		'anfs',
+		'aiosmb>=0.4.13',
+		'anfs>=0.0.3',
 		'toml',
 	],
 	
@@ -56,6 +56,3 @@ setup(
 
 	}
 )
-
-
-
