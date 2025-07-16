@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import override
 
 from aiosmb.commons.interfaces.machine import SMBMachine
 from aiosmb.commons.interfaces.file import SMBFile
@@ -24,14 +23,14 @@ class ProtocolClient(ABC):
 		pass
 
 class SMBProtocolClient(ProtocolClient):
-	@override
+	
 	def __init__(self, factory, target):
 		self.factory = factory
 		self.target = target
 		self.connection = None
 		self.machine = None
 
-	@override
+	
 	async def connect_to_target(self, target):
 		self.connection = self.factory.create_connection_newtarget(target)
 		_, err = await self.connection.login()
@@ -40,17 +39,17 @@ class SMBProtocolClient(ProtocolClient):
 
 		self.machine = SMBMachine(self.connection)
 
-	@override
+	
 	async def donwload_file(self, file: SMBFile, localpath, max_size):
 		return await file.download(self.connection, localpath)
 
-	@override
+	
 	async def enum_files_with_filter(self, filter):
 		async for obj, otype, err in self.machine.enum_files_with_filter(filter):
 			yield obj, otype, err
 
 class NFSProtocolClient(ProtocolClient):
-	@override
+	
 	def __init__(self, factory, target):
 		self.factory = factory
 		self.target = target
@@ -58,11 +57,11 @@ class NFSProtocolClient(ProtocolClient):
 		self.client = None
 		self.newfactory = None
 
-	@override
+	
 	async def connect_to_target(self, target):
 		self.newfactory = self.factory.create_factory_newtarget(target)
 
-	@override
+	
 	async def donwload_file(self, file, localpath, max_size):
 		return await self.client.download_file(file.nfs_file.handle, localpath, max_size = max_size, uid = file.nfs_file.uid, gid = file.nfs_file.gid)
 
@@ -74,7 +73,7 @@ class NFSProtocolClient(ProtocolClient):
 
 		return filter_cb
 
-	@override
+	
 	async def enum_files_with_filter(self, filter):
 		async with self.newfactory.get_mount() as mount:
 			mountpoints, err = await mount.export()
