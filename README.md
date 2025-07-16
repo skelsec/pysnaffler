@@ -17,7 +17,7 @@ Snaffler's author's Twitter: @mikeloss and @sh3r4_hax
 The project is fully compatible with the TOML based rulesets from the original Snaffler project, the SMB connectivity is based on the [aiosmb](https://github.com/skelsec/aiosmb) library. Note: the Snaffler's core config file is NOT compatible with this project.
 
 # Usage
-Either install it via pip or just clone the project and install `toml` and `aiosmb>=0.4.5`.  
+Either install it via pip or just clone the project and install `toml`, `anfs` and `aiosmb>=0.4.5`.
 If installed via pip you'll get two executables: 
 - `pysnaffler`
 - `pysnaffler-whatif` (not tested)
@@ -32,4 +32,7 @@ Use `pysnaffler -h` to see all parameters.
   
 - Enumerate `win2019ad.test.corp` using the password credentials of `TEST\victim` user using `KERBEROS` auth.  
 `pysnaffler 'smb2+kerberos+password://TEST\victim:Passw0rd!1@win2019ad.test.corp/?dc=10.10.10.2' 10.10.10.2`
+
+- Enumerate `10.10.10.2` using NFS.
+`pysnaffler -n 'nfs://10.10.10.2/?privport=1' 10.10.10.2`
 
